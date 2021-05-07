@@ -14,18 +14,28 @@ async def on_message(message):
         return
 
     if message.content.lower() == ("!bbc"):
+        bbchome = requests.get("https://www.bbc.co.uk")
+        bbchomesoup = BeautifulSoup(bbchome.text, "html.parser")
         bbcnews = requests.get("https://www.bbc.co.uk/news")
-        bbcsoup = BeautifulSoup(bbcnews.text, 'html.parser')
+        bbcnewssoup = BeautifulSoup(bbcnews.text, "html.parser")
 
-        headline = bbcsoup.find(
+        topheadline = bbchomesoup.find(class_="ssrcss-egasky-Promo ett16tt0").find("p").find("span")
+        topheadline = topheadline.text
+        toplink = bbchomesoup.find(class_="ssrcss-egasky-Promo ett16tt0").find("a")
+        toplink = toplink.get("href")
+
+        mostreadheadline = bbcnewssoup.find(
             class_="gs-c-promo-heading nw-o-link gs-o-bullet__text gs-o-faux-block-link__overlay-link gel-pica-bold gs-u-pl-@xs").find(
             "span")
-        headline = headline.text
-        link = bbcsoup.find(
+        mostreadheadline = mostreadheadline.text
+        mostreadlink = bbcnewssoup.find(
             class_="gs-c-promo-heading nw-o-link gs-o-bullet__text gs-o-faux-block-link__overlay-link gel-pica-bold gs-u-pl-@xs")
-        link = "https://www.bbc.co.uk" + link.get("href")
+        mostreadlink = "https://www.bbc.co.uk" + mostreadlink.get("href")
 
 
-        await message.channel.send(f"**{headline}:** {link}")
+        await message.channel.send(f"**TOP STORY:** {topheadline}\n"
+                                   f"{toplink}")
+        await message.channel.send(f"**MOST READ STORY:** {mostreadheadline}\n"
+                                   f"{mostreadlink}")
 
 client.run("TOKEN")
