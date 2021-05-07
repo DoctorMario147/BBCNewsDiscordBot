@@ -50,5 +50,21 @@ async def on_message(message):
         await message.channel.send(f"**MOST READ STORY:** {mostreadheadline}\n"
                                    f"{mostreadlink}")
 
+    # If the message (when converted to lower case) is !sport, run the command
+    if message.content.lower() == "!sport":
+        # Request BBC sports page for later use
+        bbcsport = requests.get("https://www.bbc.co.uk/sport")
+        bbcsportsoup = BeautifulSoup(bbcsport.text, "html.parser")
+
+        # Scrape BBC Sports to find the top story, and then assign variables
+        topsportheadline = bbcsportsoup.find(class_="gel-layout__item gel-3/4@xxl sp-o-keyline sp-o-no-keyline@m").find("h3")
+        topsportheadline = topsportheadline.text
+        topsportlink = bbcsportsoup.find(class_="gel-layout__item gel-3/4@xxl sp-o-keyline sp-o-no-keyline@m").find("a")
+        topsportlink = "https://www.bbc.co.uk" + topsportlink.get("href")
+
+        # Send message to where command was called
+        await message.channel.send(f"**TOP SPORT STORY:** {topsportheadline}\n"
+                                   f"{topsportlink}")
+
 # Actually runs the bot with the unique token
 client.run("TOKEN")
